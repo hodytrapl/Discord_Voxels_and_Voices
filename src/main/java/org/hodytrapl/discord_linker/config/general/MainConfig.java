@@ -1,4 +1,4 @@
-package org.hodytrapl.discord_linker.config.mainConfig;
+package org.hodytrapl.discord_linker.config.general;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,6 +16,7 @@ public class MainConfig {
     }
 
     // --- Параметры конфига (основные) ---
+    public final ModConfigSpec.ConfigValue<String> langSelect;
     public final ModConfigSpec.BooleanValue enableBot;
     public final ModConfigSpec.ConfigValue<String> botToken;
     public final ModConfigSpec.ConfigValue<String> channelID;
@@ -27,6 +28,9 @@ public class MainConfig {
         /*здесь будет создание главных настроек конфига основных данных*/
         // группа главных настроек
         builder.comment("General settings").push("general");
+        langSelect = builder
+                .comment("support [en_us, ru_ru]")
+                .define("lang", "en_us");
         enableBot = builder
                 .comment("Enable Bot")
                 .define("active", false);

@@ -19,11 +19,18 @@ public class EventsConfig {
 
     public final EventEntryConfig playerJoin;
     public final EventEntryConfig playerLeave;
+    public final EventEntryConfig serverStarted;
+    public final EventEntryConfig serverStopped;
+    public final EventEntryConfig serverCrashed;
+
 
     public EventsConfig(ModConfigSpec.Builder builder) {
         builder.comment("All event-related settings").push("events");
         playerJoin = new EventEntryConfig(builder, "player_join","%username% joined in game!","");
         playerLeave = new EventEntryConfig(builder, "player_leave","%username% leave in game!","");
+        serverStarted = new EventEntryConfig(builder, "Server_started","Server Started!","");
+        serverStopped = new EventEntryConfig(builder, "Server_stopped","Server Stopped!","");
+        serverCrashed = new EventEntryConfig(builder, "Server_crashed","Server Crashed!","");
         builder.pop(); // events
     }
 }

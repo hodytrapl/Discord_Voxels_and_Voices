@@ -1,162 +1,83 @@
 package org.hodytrapl.discord_linker.config.commands;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.mojang.logging.LogUtils;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.hodytrapl.discord_linker.config.ModPaths;
-import org.slf4j.Logger;
-
 public class CommandsConfig {
-    private static final Path CONFIG_FILE = ModPaths.getConfigDir().resolve("commands.toml");
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final CommandsConfig INSTANCE;
+    public static final ModConfigSpec SPEC;
 
-    // --- Общие настройки команд (вынесены из general.toml) ---
-    private static String commandPrefix = "/";
-    private static int normalUserPermissionLevel = 2;
-    private static int managementUserPermissionLevel = 4;
-    private static List<String> otherBotsPrefixes = new ArrayList<>();
+    // Global command settings
+    public final ModConfigSpec.ConfigValue<String> commandPrefix;
+    public final ModConfigSpec.IntValue normalUserPermissionLevel;
+    public final ModConfigSpec.IntValue managementUserPermissionLevel;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> otherBotsPrefixes;
 
-    // --- Список команд ---
-    private static List<CommandEntry> commands = new ArrayList<>();
+    // Individual command entries
+    public final CommandsEntryConfig TPSCommand;
+    public final CommandsEntryConfig modListCommand;
+    public final CommandsEntryConfig onlineListCommand;
 
-    public static void load() {
-        // Файл может ещё не существовать — тогда ничего не читаем, но в MainConfig есть дефолт.
-        commands.clear();
-        // Сброс настроек к значениям по умолчанию (на случай перезагрузки)
-        commandPrefix = "/";
-        normalUserPermissionLevel = 2;
-        managementUserPermissionLevel = 4;
-        otherBotsPrefixes.clear();
+    static {
+        Pair<CommandsConfig, ModConfigSpec> pair = new ModConfigSpec.Builder()
+                .configure(CommandsConfig::new);
+        INSTANCE = pair.getLeft();
+        SPEC = pair.getRight();
+    }
+    @SuppressWarnings("deprecation")
+    public CommandsConfig(ModConfigSpec.Builder builder) {
+        builder.comment("All command-related settings").push("commands");
 
-        if (!CONFIG_FILE.toFile().exists()) {
-            createDefaultConfig();
-        }
+        commandPrefix = builder
+                .comment("Prefix used for Minecraft commands (e.g. '/' or '!')")
+                .define("command_prefix", "/");
 
-        // Читаем файл
-        try (CommentedFileConfig config = CommentedFileConfig.builder(CONFIG_FILE).build()) {
-            config.load();
+        normalUserPermissionLevel = builder
+                .comment("Permission level required for normal user commands (0-4)")
+                .defineInRange("normal_user_permission_level", 2, 0, 4);
 
-            // --- Чтение общих настроек команд ---
-            String prefix = config.get("command_settings.command_prefix");
-            if (prefix != null) commandPrefix = prefix;
+        managementUserPermissionLevel = builder
+                .comment("Permission level required for management commands (0-4)")
+                .defineInRange("management_user_permission_level", 4, 0, 4);
 
-            Integer normalLevel = config.get("command_settings.command_normal_user_permission_level");
-            if (normalLevel != null) normalUserPermissionLevel = normalLevel;
+        otherBotsPrefixes = builder
+                .comment("List of command prefixes used by other bots (to avoid conflicts)")
+                .defineListAllowEmpty("other_bots_prefixes", Arrays.asList("!", "."),
+                        obj -> obj instanceof String && !((String) obj).isEmpty());
 
-            Integer managementLevel = config.get("command_settings.command_management_user_permission_level");
-            if (managementLevel != null) managementUserPermissionLevel = managementLevel;
 
-            List<String> prefixes = config.get("command_settings.other_bots_command_prefixes");
-            if (prefixes != null) otherBotsPrefixes = prefixes;
+        TPSCommand = new CommandsEntryConfig(builder, "tps",
+                "neoforge tps", "tps", false);
 
-            // --- Чтение списка команд ---
-            var commandsRaw = config.get("command_settings.command");
-            if (commandsRaw instanceof List<?> rawList) {
-                for (Object obj : rawList) {
-                    if (obj instanceof com.electronwill.nightconfig.core.Config tbl) {
-                        Boolean enabled = tbl.get("enabled");
-                        String minecraftCmd = tbl.get("minecraft_command");
-                        String discordCmd = tbl.get("discord_command");
-                        Boolean management = tbl.get("management_command");
+        modListCommand = new CommandsEntryConfig(builder, "modlist",
+                "discrodlinker mods", "mods", false);
 
-                        if (minecraftCmd != null && discordCmd != null && management != null && enabled != null) {
-                            commands.add(new CommandEntry(
-                                    enabled, minecraftCmd, discordCmd, management
-                            ));
-                        } else {
-                            LOGGER.warn("Skipping incomplete command entry: {}", tbl);
-                        }
-                    }
-                }
-            }
+        onlineListCommand = new CommandsEntryConfig(builder, "list",
+                "list", "list", false);
 
-            LOGGER.info("Loaded {} commands from config", commands.size());
-        } catch (Exception e) {
-            LOGGER.error("Failed to load commands from config", e);
-        }
+        builder.pop(); // general
     }
 
-    public static class CommandEntry {
-        public final boolean enabled;
-        public final String minecraftCommand;
-        public final String discordCommand;
-        public final boolean managementCommand;
-
-        public CommandEntry( boolean enabled,String minecraftCommand, String discordCommand,
-                            boolean managementCommand) {
-            this.enabled = enabled;
-            this.minecraftCommand = minecraftCommand;
-            this.discordCommand = discordCommand;
-            this.managementCommand = managementCommand;
-        }
+    // ---- Helper getters for convenience ----
+    public String getCommandPrefix() {
+        return commandPrefix.get();
     }
 
-    private static String generateDefaultTemplate() {
-        // Используем StringBuilder для удобства добавления новых секций
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("# Configuration for Minecraft <-> Discord command mapping\n");
-        sb.append("# This file is auto-generated if missing. Edit it to add your commands.\n\n");
-
-        sb.append("[command_settings]\n");
-        sb.append("\t#-\n");
-        sb.append("\tcommand_prefix = \"").append(commandPrefix).append("\"\n");
-        sb.append("\t#-\n");
-        sb.append("\t# Range: 0 ~ 4\n");
-        sb.append("\tcommand_normal_user_permission_level = ").append(normalUserPermissionLevel).append("\n");
-        sb.append("\t#-\n");
-        sb.append("\tcommand_management_user_permission_level = ").append(managementUserPermissionLevel).append("\n");
-        sb.append("\t#-\n");
-        sb.append("\tother_bots_command_prefixes = []\n\n");
-
-        // Пример команды (можно сделать массив примеров и циклом)
-        sb.append("\t#Example command (add more blocks like this)\n");
-        sb.append("\t[[command_settings.command]]\n");
-        sb.append("\t\t#-\n");
-        sb.append("\t\tenabled = true\n");
-        sb.append("\t\t#-\n");
-        sb.append("\t\tminecraft_command = \"neoforge tps\"\n");
-        sb.append("\t\t#-\n");
-        sb.append("\t\tdiscord_command = \"tps\"\n");
-        sb.append("\t\t#-\n");
-        sb.append("\t\tmanagement_command = false\n");
-
-
-        return sb.toString();
+    public int getNormalUserPermissionLevel() {
+        return normalUserPermissionLevel.get();
     }
 
-    private static void createDefaultConfig() {
-        try {
-            Files.createDirectories(CONFIG_FILE.getParent());
-            Files.writeString(CONFIG_FILE, generateDefaultTemplate());
-            LOGGER.info("Created default commands.toml with template. Edit it and restart/reload.");
-        } catch (Exception e) {
-            LOGGER.error("Failed to create default commands.toml", e);
-        }
-    }
-    // --- Геттеры для доступа из других частей мода ---
-    public static String getCommandPrefix() {
-        return commandPrefix;
+    public int getManagementUserPermissionLevel() {
+        return managementUserPermissionLevel.get();
     }
 
-    public static int getNormalUserPermissionLevel() {
-        return normalUserPermissionLevel;
+    public List<? extends String> getOtherBotsPrefixes() {
+        return otherBotsPrefixes.get();
     }
 
-    public static int getManagementUserPermissionLevel() {
-        return managementUserPermissionLevel;
-    }
-
-    public static List<String> getOtherBotsPrefixes() {
-        return otherBotsPrefixes;
-    }
-
-    public static List<CommandEntry> getCommands() {
-        return commands;
-    }
+    // Command entry getters
+    public CommandsEntryConfig getTPSCommand() { return TPSCommand; }
 }
