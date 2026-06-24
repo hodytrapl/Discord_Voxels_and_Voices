@@ -7,11 +7,13 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.language.IModInfo;
+import org.hodytrapl.discord_linker.utils.config.CommandsConfigHelper;
 
 public class ModListCommand  {
     //регистрируем команду
     public static LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("mods")
+                .requires(source -> source.hasPermission(CommandsConfigHelper.getMinecraftManagementUserPermissionLevel()))
                 .executes(context -> {
                     // Логика подкоманды /discordlinker mods
                     ModList modList = ModList.get();

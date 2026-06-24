@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 @Mod(Discord_linker.MODID)
 public class Discord_linker {
     public static final String MODID = "discord_linker";
-    private static final Logger LOGGER = LogUtils.getLogger();
     private static ConfigManager configManager;
     private static DiscordBotManager botManager;
 

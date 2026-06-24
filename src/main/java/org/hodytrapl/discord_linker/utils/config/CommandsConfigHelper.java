@@ -13,12 +13,12 @@ public class CommandsConfigHelper {
         return CommandsConfig.INSTANCE.commandPrefix.get();
     }
 
-    public static int getNormalUserPermissionLevel() {
-        return CommandsConfig.INSTANCE.normalUserPermissionLevel.get();
+    public static String getDiscordManagementUserRole() {
+        return CommandsConfig.INSTANCE.discordManagementUserRole.get();
     }
 
-    public static int getManagementUserPermissionLevel() {
-        return CommandsConfig.INSTANCE.managementUserPermissionLevel.get();
+    public static int getMinecraftManagementUserPermissionLevel() {
+        return CommandsConfig.INSTANCE.minecraftManagementUserPermissionLevel.get();
     }
 
     public static List<? extends String> getOtherBotsPrefixes() {

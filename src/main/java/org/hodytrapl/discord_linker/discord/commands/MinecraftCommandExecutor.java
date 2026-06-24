@@ -68,7 +68,6 @@ public class MinecraftCommandExecutor {
         );
 
         try {
-            // ВАЖНО: без submit().get()
             server.getCommands().performPrefixedCommand(wrappedStack, normalizedCommand);
         } catch (Exception e) {
             LOGGER.error("Ошибка выполнения {}: {}", normalizedCommand, e.getMessage(), e);

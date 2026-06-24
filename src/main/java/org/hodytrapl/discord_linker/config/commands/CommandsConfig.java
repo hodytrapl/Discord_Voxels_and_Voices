@@ -12,8 +12,8 @@ public class CommandsConfig {
 
     // глобальные настройки группы команд
     public final ModConfigSpec.ConfigValue<String> commandPrefix;
-    public final ModConfigSpec.IntValue normalUserPermissionLevel;
-    public final ModConfigSpec.IntValue managementUserPermissionLevel;
+    public final ModConfigSpec.ConfigValue<String> discordManagementUserRole;
+    public final ModConfigSpec.IntValue minecraftManagementUserPermissionLevel;
     public final ModConfigSpec.ConfigValue<List<? extends String>> otherBotsPrefixes;
 
     // команды
@@ -36,13 +36,15 @@ public class CommandsConfig {
                 .comment("Prefix used for Minecraft commands (e.g. '/' or '!')")
                 .define("command_prefix", "/");
 
-        normalUserPermissionLevel = builder
-                .comment("Permission level required for normal user commands (0-4)")
-                .defineInRange("normal_user_permission_level", 2, 0, 4);
+        discordManagementUserRole = builder
+                .comment("Discord role ID that grants access to bot commands. " +
+                        "Users with this role will receive responses from the bot.")
+                .define("discord_management_user_roleID", "00000000000000000000");
 
-        managementUserPermissionLevel = builder
+
+        minecraftManagementUserPermissionLevel = builder
                 .comment("Permission level required for management commands (0-4)")
-                .defineInRange("management_user_permission_level", 4, 0, 4);
+                .defineInRange("minecraft_management_user_permission_level", 4, 0, 4);
 
         otherBotsPrefixes = builder
                 .comment("List of command prefixes used by other bots (to avoid conflicts)")

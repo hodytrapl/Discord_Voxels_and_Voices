@@ -61,7 +61,7 @@ public class ServerOCCListener {
                 (ValidationUtils.isValidId(channelId) ? channelId : null);
         if (correctId == null) return;
 
-        if (EventsConfigHelper.useEmbedForEvent(eventConfig)) {
+        if (EventsConfigHelper.isEmbedEnable(eventConfig)) {
             MessageEmbed embed = GeneratorEmbedMessage.buildEmbed(eventConfig, "");
             if (sync) {
                 botManager.sendEmbedSync(correctId, embed);

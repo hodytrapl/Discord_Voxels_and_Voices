@@ -7,37 +7,40 @@ import org.hodytrapl.discord_linker.config.events.EventEntryConfig;
 import org.hodytrapl.discord_linker.utils.config.EventsConfigHelper;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
-
-import static org.hodytrapl.discord_linker.utils.config.EventsConfigHelper.replaceHeadPlayer;
+import java.util.Map;
 
 public class GeneratorEmbedMessage extends ListenerAdapter {
 
-    public static MessageEmbed buildEmbed(EventEntryConfig event, String username) {
-        EmbedBuilder builder = new EmbedBuilder();
-
-        // Замена плейсхолдеров в текстовых полях
-        String title = EventsConfigHelper.getEmbedTitle(event);
-        String description = EventsConfigHelper.getEmbedDescription(event);
-        String authorName = EventsConfigHelper.getEmbedAuthorName(event);
-        String authorIcon = EventsConfigHelper.getEmbedAuthorIcon(event);
-        String thumbnail = EventsConfigHelper.getEmbedThumbnail(event);
-        String image = EventsConfigHelper.getEmbedImage(event);
-        String footer = EventsConfigHelper.getEmbedFooter(event);
-        String footerIcon = EventsConfigHelper.getEmbedFooterIcon(event);
-        String colorStr = EventsConfigHelper.getEmbedColor(event);
-        boolean timestamp = EventsConfigHelper.isEmbedTimestampEnabled(event);
-        List<? extends String> fields = EventsConfigHelper.getEmbedFields(event);
-
-        // Заменяем %username% в текстовых полях
-        if (username != null) {
-            title = EventsConfigHelper.replaceUsername(title, username);
-            description = EventsConfigHelper.replaceUsername(description, username);
-            authorName = EventsConfigHelper.replaceUsername(authorName, username);
-            footer = EventsConfigHelper.replaceUsername(footer, username);
+    /**
+     * Основной метод сборки embed с произвольным набором плейсхолдеров.
+     * @param event конфиг события
+     * @param placeholders карта замен (ключ – без процентов, значение – подставляемый текст)
+     * @return готовый MessageEmbed
+     */
+    public static MessageEmbed buildEmbed(EventEntryConfig event, Map<String, String> placeholders) {
+        // Если карта null, используем пустую (чтобы избежать NPE)
+        if (placeholders == null) {
+            placeholders = new HashMap<>();
         }
 
-        // Устанавливаем поля
+        EmbedBuilder builder = new EmbedBuilder();
+
+        // Получаем все значения из конфига с автоматической подстановкой плейсхолдеров
+        String title = EventsConfigHelper.getFormattedEmbedTitle(event, placeholders);
+        String description = EventsConfigHelper.getFormattedEmbedDescription(event, placeholders);
+        String authorName = EventsConfigHelper.getFormattedEmbedAuthorName(event, placeholders);
+        String authorIcon = EventsConfigHelper.getFormattedEmbedAuthorIcon(event, placeholders);
+        String thumbnail = EventsConfigHelper.getFormattedEmbedThumbnail(event, placeholders);
+        String image = EventsConfigHelper.getFormattedEmbedImage(event, placeholders);
+        String footer = EventsConfigHelper.getFormattedEmbedFooter(event, placeholders);
+        String footerIcon = EventsConfigHelper.getFormattedEmbedFooterIcon(event, placeholders);
+        String colorStr = EventsConfigHelper.getFormattedEmbedColor(event, placeholders);
+        boolean timestamp = EventsConfigHelper.isEmbedTimestampEnabled(event);
+        List<EventEntryConfig.EmbedField> fields = EventsConfigHelper.getFormattedEmbedFields(event, placeholders);
+
+        // Устанавливаем поля (все уже отформатированы)
         if (authorName != null && !authorName.isEmpty()) {
             builder.setAuthor(authorName, null, authorIcon != null && !authorIcon.isEmpty() ? authorIcon : null);
         }
@@ -50,13 +53,11 @@ public class GeneratorEmbedMessage extends ListenerAdapter {
             builder.setDescription(description);
         }
 
-        // Цвет
         if (colorStr != null && !colorStr.isEmpty()) {
             try {
-                Color color = Color.decode(colorStr);
-                builder.setColor(color);
-            } catch (NumberFormatException e) {
-                // Если цвет невалидный, пропускаем
+                builder.setColor(Color.decode(colorStr));
+            } catch (NumberFormatException ignored) {
+                // Невалидный цвет — игнорируем
             }
         }
 
@@ -65,9 +66,6 @@ public class GeneratorEmbedMessage extends ListenerAdapter {
         }
 
         if (image != null && !image.isEmpty()) {
-            if(image.equals("%headplayer%")&&username!=null&&!username.isEmpty()){
-                image=replaceHeadPlayer(image,username);
-            }
             builder.setImage(image);
         }
 
@@ -79,24 +77,27 @@ public class GeneratorEmbedMessage extends ListenerAdapter {
             builder.setTimestamp(java.time.Instant.now());
         }
 
-        // Добавляем поля
+        // Добавляем поля (уже отформатированные внутри хелпера)
         if (fields != null) {
-            for (String fieldStr : fields) {
-                String[] parts = fieldStr.split("\\|", 3);
-                if (parts.length == 3) {
-                    String name = parts[0];
-                    String value = parts[1];
-                    boolean inline = Boolean.parseBoolean(parts[2]);
-                    // Заменяем плейсхолдеры в name и value
-                    if (username != null) {
-                        name = EventsConfigHelper.replaceUsername(name, username);
-                        value = EventsConfigHelper.replaceUsername(value, username);
-                    }
-                    builder.addField(name, value, inline);
-                }
+            for (EventEntryConfig.EmbedField field : fields) {
+                builder.addField(field.name, field.value, field.inline);
             }
         }
 
         return builder.build();
+    }
+
+    /**
+     * Удобная перегрузка для случаев, когда нужен только %username%.
+     * Создаёт карту с ключом "username" и значением, а также автоматически добавляет
+     * "headplayer" для совместимости со старым поведением.
+     */
+    public static MessageEmbed buildEmbed(EventEntryConfig event, String username) {
+        Map<String, String> placeholders = new HashMap<>();
+        if (username != null) {
+            placeholders.put("username", username);
+            placeholders.put("headplayer", "https://minotar.net/avatar/" + username + "/64");
+        }
+        return buildEmbed(event, placeholders);
     }
 }

@@ -16,6 +16,10 @@ import org.hodytrapl.discord_linker.utils.config.EventsConfigHelper;
 import org.hodytrapl.discord_linker.utils.config.MainConfigHelper;
 import org.slf4j.Logger;
 
+import java.util.Map;
+
+import static org.hodytrapl.discord_linker.utils.Utils.formatPlaceholder;
+
 @EventBusSubscriber(modid = "discord_linker")
 public class JoinLeavePlayerListener {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -28,7 +32,7 @@ public class JoinLeavePlayerListener {
         //форматируем сообщение
         Player player = event.getEntity();
         String username = player.getName().getString();
-        String message = EventsConfigHelper.replaceUsername(EventsConfigHelper.getRawEventMessage(EventsConfig.INSTANCE.playerJoin),username);
+        String message = EventsConfigHelper.getFormattedEventMessage(EventsConfig.INSTANCE.playerJoin,"username",username);
 
         //находим бота
         DiscordBotManager botManager = Discord_linker.getBotManager();
@@ -45,7 +49,7 @@ public class JoinLeavePlayerListener {
         //даем запрос
         if (ValidationUtils.isValidId(correctId)) {
             // проверка embed включен
-            if (EventsConfigHelper.useEmbedForEvent(EventsConfig.INSTANCE.playerJoin)) {
+            if (EventsConfigHelper.isEmbedEnable(EventsConfig.INSTANCE.playerJoin)) {
                 MessageEmbed embed = GeneratorEmbedMessage.buildEmbed(EventsConfig.INSTANCE.playerJoin, username);
                 botManager.sendEmbed(correctId, embed);
             } else {
@@ -62,7 +66,7 @@ public class JoinLeavePlayerListener {
         //форматируем сообщение
         Player player = event.getEntity();
         String username = player.getName().getString();
-        String message = EventsConfigHelper.replaceUsername(EventsConfigHelper.getRawEventMessage(EventsConfig.INSTANCE.playerLeave),username);
+        String message = EventsConfigHelper.getFormattedEventMessage(EventsConfig.INSTANCE.playerLeave,"username",username);
 
         //находим бота
         DiscordBotManager botManager = Discord_linker.getBotManager();
@@ -79,7 +83,7 @@ public class JoinLeavePlayerListener {
         //даем запрос
         if (ValidationUtils.isValidId(correctId)) {
             // проверка embed включен
-            if (EventsConfigHelper.useEmbedForEvent(EventsConfig.INSTANCE.playerLeave)) {
+            if (EventsConfigHelper.isEmbedEnable(EventsConfig.INSTANCE.playerLeave)) {
                 MessageEmbed embed = GeneratorEmbedMessage.buildEmbed(EventsConfig.INSTANCE.playerLeave, username);
                 botManager.sendEmbed(correctId, embed);
             } else {

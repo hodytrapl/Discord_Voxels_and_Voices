@@ -12,7 +12,7 @@ public class ConfigReloadListener {
     //перезагружаем все конфиги сервера и бота
     @SubscribeEvent
     public static void onConfigReload(ModConfigEvent.Reloading event) {
-            if (event.getConfig().getType() == ModConfig.Type.SERVER) {
+        if (event.getConfig().getType() == ModConfig.Type.SERVER) {
             Discord_linker.getBotManager().reloadBot();
         }
     }

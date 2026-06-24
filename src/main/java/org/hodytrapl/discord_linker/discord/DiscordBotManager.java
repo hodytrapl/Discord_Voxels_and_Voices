@@ -10,11 +10,12 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.hodytrapl.discord_linker.config.general.MainConfig;
 import org.hodytrapl.discord_linker.discord.commands.CommandListener;
 import org.hodytrapl.discord_linker.discord.enums.DiscordMessageType;
-import org.hodytrapl.discord_linker.utils.ValidationUtils;
 import org.hodytrapl.discord_linker.utils.config.MainConfigHelper;
 import org.slf4j.Logger;
 
 import javax.security.auth.login.LoginException;
+
+import static org.hodytrapl.discord_linker.utils.ValidationUtils.isValidId;
 
 public class DiscordBotManager {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -25,11 +26,13 @@ public class DiscordBotManager {
     public void initializeBot() {
         synchronized (lock) {
             if (initialized) return;
+            if (!MainConfigHelper.isBotEnabled()) return;
             String token = MainConfig.INSTANCE.botToken.get();
             if (token.equals("INSERT_BOT_TOKEN_HERE") || token.equals("BOT_TOKEN_HERE")) {
                 LOGGER.warn("Discord bot token not configured. Bot will not start.");
                 return;
             }
+
             try {
                 JDABuilder builder = JDABuilder.createDefault(token);
                 builder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
@@ -66,11 +69,6 @@ public class DiscordBotManager {
             initializeBot();
         }
     }
-
-    private boolean isValidId(String id) {
-        return id != null && !id.isEmpty() && !id.equals("0000000000000000000") && !id.equals("BOT_TOKEN_HERE");
-    }
-
     public void sendMessage(String channelId, String content, DiscordMessageType type) {
         if (jda == null) {
             LOGGER.warn("Cannot send Discord message – bot not initialized");
@@ -122,7 +120,7 @@ public class DiscordBotManager {
     }
 
     public void sendEmbed(String channelId, MessageEmbed embed) {
-        if (jda == null || !ValidationUtils.isValidId(channelId)) {
+        if (jda == null || !isValidId(channelId)) {
             LOGGER.warn("Cannot send embed: bot not ready or invalid channel");
             return;
         }
