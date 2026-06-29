@@ -18,12 +18,27 @@ import com.mojang.logging.LogUtils;
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 import static org.hodytrapl.discord_linker.utils.ValidationUtils.isValidId;
 
+/**
+ * Слушатель команд из Discord чата.
+ * <p>
+ * Этот класс обрабатывает сообщения из Discord, определяет, являются ли они командами,
+ * и выполняет соответствующие действия в Minecraft. Поддерживает различные префиксы
+ * команд и проверку прав доступа.
+ * </p>
+ */
 public class CommandListener extends ListenerAdapter {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final String commandPrefix;
     private final java.util.List<? extends String> otherPrefixes;
     private final String allowedChannelId;
 
+    /**
+     * Конструктор слушателя команд.
+     * <p>
+     * Инициализирует префиксы команд и ID разрешенного канала из конфигурации.
+     * Если канал для команд не задан, используется основной канал.
+     * </p>
+     */
     public CommandListener() {
         this.commandPrefix = CommandsConfigHelper.getCommandPrefix();
         this.otherPrefixes = CommandsConfigHelper.getOtherBotsPrefixes();
@@ -51,6 +66,16 @@ public class CommandListener extends ListenerAdapter {
         }
     }
 
+
+    /**
+     * Обрабатывает полученное сообщение из Discord.
+     * <p>
+     * Проверяет, является ли сообщение командой, и если да - выполняет её.
+     * Поддерживает проверку прав доступа для управленческих команд.
+     * </p>
+     *
+     * @param event событие получения сообщения из Discord
+     */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;

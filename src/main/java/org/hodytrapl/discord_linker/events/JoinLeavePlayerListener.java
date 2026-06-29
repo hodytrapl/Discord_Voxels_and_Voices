@@ -20,10 +20,22 @@ import java.util.Map;
 
 import static org.hodytrapl.discord_linker.utils.Utils.formatPlaceholder;
 
+/**
+ * Слушатель событий входа и выхода игроков на сервер.
+ * <p>
+ * Отправляет уведомления в Discord при подключении или отключении игрока,
+ * используя конфигурацию событий {@code playerJoin} и {@code playerLeave}.
+ * </p>
+ */
 @EventBusSubscriber(modid = "discord_linker")
 public class JoinLeavePlayerListener {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    /**
+     * Обрабатывает событие входа игрока на сервер.
+     *
+     * @param event событие входа игрока
+     */
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         // проверка на срабатывания ивента
@@ -58,6 +70,11 @@ public class JoinLeavePlayerListener {
         }
     }
 
+    /**
+     * Обрабатывает событие выхода игрока с сервера.
+     *
+     * @param event событие выхода игрока
+     */
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         // проверка на срабатывания ивента

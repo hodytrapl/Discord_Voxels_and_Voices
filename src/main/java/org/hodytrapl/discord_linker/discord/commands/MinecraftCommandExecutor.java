@@ -10,9 +10,27 @@ import org.slf4j.Logger;
 
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 
+/**
+ * Исполнитель Minecraft команд из Discord.
+ * <p>
+ * Этот класс выполняет команды Minecraft и захватывает их вывод для отправки
+ * обратно в Discord. Использует собственный источник команд для перехвата
+ * вывода команд.
+ * </p>
+ */
 public class MinecraftCommandExecutor {
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    /**
+     * Выполняет команду Minecraft и возвращает её вывод.
+     * <p>
+     * Метод создает специальный источник команд, который перехватывает
+     * все сообщения, отправляемые командой, и возвращает их как строку.
+     * </p>
+     *
+     * @param command команда для выполнения (с или без префикса "/")
+     * @return строка с выводом команды или сообщение об ошибке
+     */
     public static String executeCommandWithOutput(String command) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) {

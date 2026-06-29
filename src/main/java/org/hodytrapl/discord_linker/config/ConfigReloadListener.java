@@ -9,11 +9,26 @@ import org.hodytrapl.discord_linker.Discord_linker;
 import org.hodytrapl.discord_linker.LanguageManager;
 import org.slf4j.Logger;
 
+/**
+ * Слушатель перезагрузки конфигурации для Discord Linker.
+ * <p>
+ * Этот класс обрабатывает события загрузки и перезагрузки конфигурации,
+ * автоматически обновляя настройки бота и языковые файлы при изменении
+ * конфигурационных файлов.
+ * </p>
+ */
 @EventBusSubscriber(modid = "discord_linker")
 public class ConfigReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    // Первая загрузка конфига (серверный тип)
+    /**
+     * Обрабатывает событие первоначальной загрузки конфигурации.
+     * <p>
+     * Вызывается при первом запуске сервера или при активации мода.
+     * </p>
+     *
+     * @param event событие загрузки конфигурации
+     */
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading event) {
         if (event.getConfig().getType() == ModConfig.Type.SERVER) {
@@ -22,7 +37,15 @@ public class ConfigReloadListener {
         }
     }
 
-    // Перезагрузка конфига (по /reload или изменению файла)
+    /**
+     * Обрабатывает событие перезагрузки конфигурации.
+     * <p>
+     * Вызывается при изменении конфигурационных файлов или при выполнении
+     * команды {@code /reload} на сервере.
+     * </p>
+     *
+     * @param event событие перезагрузки конфигурации
+     */
     @SubscribeEvent
     public static void onConfigReload(ModConfigEvent.Reloading event) {
         if (event.getConfig().getType() == ModConfig.Type.SERVER) {
@@ -31,6 +54,13 @@ public class ConfigReloadListener {
         }
     }
 
+    /**
+     * Выполняет полную перезагрузку всех компонентов мода.
+     * <p>
+     * Перезагружает языковые файлы и перезапускает Discord бота
+     * с новыми настройками.
+     * </p>
+     */
     private static void reloadEverything() {
         try {
             LanguageManager.reload(); // Теперь конфиг загружен, можно читать langSelect

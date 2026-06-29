@@ -7,8 +7,21 @@ import java.util.Map;
 
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 
-
+/**
+ * Общие утилитные методы для работы со строками, форматированием и плейсхолдерами.
+ */
 public class Utils {
+
+    /**
+     * Очищает строку от цветовых кодов форматирования Minecraft.
+     * <p>
+     * Заменяет символы {@code &} на {@code §}, удаляет все коды форматирования
+     * и возвращает чистый текст без форматирования.
+     * </p>
+     *
+     * @param text исходная строка с возможными цветовыми кодами
+     * @return строка без форматирования
+     */
     public static String cleanFormatting(String text) {
         if (text == null || text.isEmpty()) return "";
 
@@ -23,6 +36,13 @@ public class Utils {
         return stripped.replace('§', '&');
     }
 
+    /**
+     * Заменяет плейсхолдеры вида {@code %ключ%} на соответствующие значения из карты.
+     *
+     * @param text строка с плейсхолдерами
+     * @param placeholders карта соответствий ключ -> значение
+     * @return строка с заменёнными плейсхолдерами
+     */
     public static String formatPlaceholder(String text, Map<String, String> placeholders) {
         if (text == null || text.isEmpty()) return text;
         if (placeholders == null || placeholders.isEmpty()) return text;
@@ -37,7 +57,14 @@ public class Utils {
         return text;
     }
 
-    //по парам ключ-значение,ключ-значение
+    /**
+     * Заменяет плейсхолдеры, используя массив чередующихся ключей и значений.
+     *
+     * @param text строка с плейсхолдерами
+     * @param pairs массив вида {ключ1, значение1, ключ2, значение2, ...}
+     * @return строка с заменёнными плейсхолдерами
+     * @throws IllegalArgumentException если массив имеет нечётную длину
+     */
     public static String formatPlaceholder(String text, String... pairs) {
         if (pairs == null || pairs.length % 2 != 0) {
             throw new IllegalArgumentException(getMessage("mod.typelogger.utils.error.placeholder.arg"));
@@ -49,7 +76,17 @@ public class Utils {
         return formatPlaceholder(text, map);
     }
 
-    // Перегрузка для совместимости со старым вызовом (только username)
+    /**
+     * Упрощённая версия для быстрой подстановки имени пользователя.
+     * <p>
+     * Также автоматически добавляет плейсхолдер {@code headplayer} с ссылкой
+     * на аватар через Minotar.
+     * </p>
+     *
+     * @param text строка с плейсхолдерами
+     * @param username имя пользователя для подстановки в {@code %username%}
+     * @return строка с заменёнными плейсхолдерами
+     */
     public static String formatPlaceholder(String text, String username) {
         if (text == null || text.isEmpty()) return text;
         if (username == null || username.isEmpty()) return text;

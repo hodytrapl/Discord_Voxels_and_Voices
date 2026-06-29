@@ -21,13 +21,33 @@ import java.util.regex.Pattern;
 import static org.hodytrapl.discord_linker.utils.Utils.cleanFormatting;
 import static org.hodytrapl.discord_linker.utils.Utils.formatPlaceholder;
 
+/**
+ * Слушатель событий чата для пересылки сообщений из Minecraft в Discord.
+ * <p>
+ * Этот класс перехватывает сообщения игроков в Minecraft, форматирует их
+ * с учётом префиксов/суффиксов и отправляет в Discord в виде обычного
+ * текста или embed-сообщения в зависимости от конфигурации.
+ * </p>
+ */
 @EventBusSubscriber(modid = "discord_linker")
 public class ChatListener {
 
+    /**
+     * Регулярное выражение для разбора отображаемого имени игрока
+     * с поддержкой префиксов и суффиксов в формате [префикс] имя [суффикс].
+     */
     private static final Pattern DISPLAY_NAME_PATTERN =
             Pattern.compile("^\\[(.*?)\\]\\s*(.*?)(?:\\s*\\[(.*?)\\])?$");
 
-    //отправка сообщений майнкрафт в дискорд
+    /**
+     * Обрабатывает событие отправки сообщения в чат Minecraft.
+     * <p>
+     * Извлекает префикс, имя пользователя, суффикс и текст сообщения,
+     * формирует плейсхолдеры и отправляет в Discord через бота.
+     * </p>
+     *
+     * @param event событие чата сервера Minecraft
+     */
     @SubscribeEvent
     public static void receiveMCtoDC(ServerChatEvent event){
         // проверка на срабатывания ивента

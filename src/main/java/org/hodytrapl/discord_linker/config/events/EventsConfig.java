@@ -8,6 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Конфигурация всех событий для Discord Linker.
+ * <p>
+ * Этот класс содержит настройки для всех событий, которые могут быть
+ * отправлены из Minecraft в Discord и обратно.
+ * </p>
+ */
 public class EventsConfig {
     public static final EventsConfig INSTANCE;
     public static final ModConfigSpec SPEC;
@@ -28,10 +35,15 @@ public class EventsConfig {
     public final EventEntryConfig serverCrashed;
 
 
+    /**
+     * Конструктор конфигурации событий.
+     *
+     * @param builder построитель конфигурации NeoForge
+     */
     public EventsConfig(ModConfigSpec.Builder builder) {
         builder.comment("...").push("events");
 
-        // Базовый payload
+        // Базовый payload всех возможных полей
         Map<String, String> basePayload = new HashMap<>();
         basePayload.put("event_enable", "true");
         basePayload.put("message", "");

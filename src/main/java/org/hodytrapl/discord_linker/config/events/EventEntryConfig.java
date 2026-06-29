@@ -7,6 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Конфигурация отдельного события для Discord Linker.
+ * <p>
+ * Этот класс содержит настройки для конкретного события, включая
+ * текстовое сообщение, настройки embed-сообщений и все связанные
+ * с ними поля.
+ * </p>
+ */
 public class EventEntryConfig {
     // Основные настройки события
     public final ModConfigSpec.BooleanValue eventEnable;
@@ -30,6 +38,14 @@ public class EventEntryConfig {
     // Динамические поля
     public  ModConfigSpec.ConfigValue<List<? extends String>> embedFields;
 
+    /**
+     * Конструктор конфигурации события.
+     *
+     * @param builder построитель конфигурации NeoForge
+     * @param eventName имя события для группировки настроек
+     * @param payload карта с значениями по умолчанию для всех полей
+     * @param embedWorking флаг, указывающий, поддерживает ли событие embed-сообщения
+     */
     @SuppressWarnings("deprecation")
     public EventEntryConfig(ModConfigSpec.Builder builder, String eventName, Map<String, String> payload,Boolean embedWorking) {
         builder.comment("Configuration for " + eventName).push(eventName);
@@ -117,6 +133,9 @@ public class EventEntryConfig {
         builder.pop(); // завершаем событие
     }
 
+    /**
+     * Вспомогательный класс для представления поля embed-сообщения.
+     */
     public static class EmbedField {
         public final String name;
         public final String value;

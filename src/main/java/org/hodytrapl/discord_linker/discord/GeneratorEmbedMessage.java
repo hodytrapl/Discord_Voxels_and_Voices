@@ -11,8 +11,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Генератор embed-сообщений для Discord.
+ * <p>
+ * Этот класс создает форматированные embed-сообщения на основе конфигурации
+ * событий и переданных плейсхолдеров.
+ * </p>
+ */
 public class GeneratorEmbedMessage extends ListenerAdapter {
 
+    /**
+     * Создает embed-сообщение на основе конфигурации события и плейсхолдеров.
+     *
+     * @param event конфигурация события
+     * @param placeholders карта плейсхолдеров для подстановки в текст
+     * @return готовый MessageEmbed для отправки в Discord
+     */
     public static MessageEmbed buildEmbed(EventEntryConfig event, Map<String, String> placeholders) {
         // Если карта null, используем пустую (чтобы избежать NPE)
         if (placeholders == null) {
@@ -82,6 +96,16 @@ public class GeneratorEmbedMessage extends ListenerAdapter {
     }
 
 
+    /**
+     * Создает embed-сообщение с подстановкой имени пользователя.
+     * <p>
+     * Удобный метод для быстрого создания embed с плейсхолдером username.
+     * </p>
+     *
+     * @param event конфигурация события
+     * @param username имя пользователя для подстановки в плейсхолдеры
+     * @return готовый MessageEmbed для отправки в Discord
+     */
     public static MessageEmbed buildEmbed(EventEntryConfig event, String username) {
         Map<String, String> placeholders = new HashMap<>();
         if (username != null) {

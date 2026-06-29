@@ -1,10 +1,16 @@
 package org.hodytrapl.discord_linker.discord.enums;
 
+/**
+ * Перечисление типов сообщений, отправляемых в Discord.
+ * <p>
+ * Определяет способ форматирования сообщения в зависимости от его назначения.
+ * </p>
+ */
 public enum DiscordMessageType {
-    /** Response to a user command – wrapped in a code block */
+    /** Ответ на команду пользователя – оборачивается в блок кода */
     COMMAND_RESPONSE,
-    /** A plain chat message (e.g., from Minecraft player to Discord) */
+    /** Обычное чат-сообщение (например, от игрока Minecraft) */
     CHAT_MESSAGE,
-    /** System info/warning/error – prefixed with [System] */
+    /** Системное уведомление/предупреждение/ошибка – с префиксом [System] */
     SYSTEM_NOTIFICATION
 }

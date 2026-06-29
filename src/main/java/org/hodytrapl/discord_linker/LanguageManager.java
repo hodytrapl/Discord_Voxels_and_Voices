@@ -13,13 +13,27 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Менеджер локализации для загрузки и получения сообщений на разных языках.
+ * <p>
+ * Загружает JSON-файлы с переводами из ресурсов мода и предоставляет
+ * методы для получения форматированных сообщений по ключу.
+ * </p>
+ */
 public class LanguageManager {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new Gson();
     private static final Map<String, String> messages = new HashMap<>();
     private static String currentLang = null;
 
-    // Загружает переводы для языка из конфига
+    /**
+     * Перезагружает языковые файлы на основе текущей настройки в конфиге.
+     * <p>
+     * Если язык изменился или сообщения ещё не загружены, загружает
+     * соответствующий JSON-файл. В случае отсутствия запрошенного языка
+     * использует английский (en_us) как запасной.
+     * </p>
+     */
     public static void reload() {
         if (MainConfig.INSTANCE == null) {
             LOGGER.warn("MainConfig not initialized yet, skipping language reload");
@@ -53,7 +67,17 @@ public class LanguageManager {
         }
     }
 
-    // Получить сообщение по ключу с подстановкой аргументов
+    /**
+     * Возвращает локализованное сообщение по ключу с подстановкой аргументов.
+     * <p>
+     * Если сообщение для данного ключа не найдено, возвращает строку вида
+     * {@code !!ключ!!}. Поддерживает форматирование через {@link MessageFormat}.
+     * </p>
+     *
+     * @param key ключ сообщения
+     * @param args аргументы для подстановки в шаблон
+     * @return отформатированное сообщение
+     */
     public static String getMessage(String key, Object... args) {
         if (messages.isEmpty()) {
             reload(); // на всякий случай

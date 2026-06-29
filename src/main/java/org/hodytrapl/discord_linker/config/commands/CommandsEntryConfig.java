@@ -2,13 +2,29 @@ package org.hodytrapl.discord_linker.config.commands;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+/**
+ * Конфигурация отдельной команды для Discord Linker.
+ * <p>
+ * Этот класс содержит настройки для конкретной команды, включая
+ * её включение/отключение, соответствующие команды в Minecraft и Discord,
+ * а также права доступа.
+ * </p>
+ */
 public class CommandsEntryConfig {
     public final ModConfigSpec.BooleanValue enabled;
     public final ModConfigSpec.ConfigValue<String> minecraftCommand;
     public final ModConfigSpec.ConfigValue<String> discordCommand;
     public final ModConfigSpec.BooleanValue managementCommand;
 
-    //конфигуратор комманд
+    /**
+     * Конструктор конфигурации команды.
+     *
+     * @param builder построитель конфигурации NeoForge
+     * @param commandName имя команды для группировки настроек
+     * @param defaultMinecraftCommand команда Minecraft по умолчанию
+     * @param defaultDiscordCommand команда Discord по умолчанию
+     * @param defaultManagement является ли команда управленческой
+     */
     public CommandsEntryConfig(ModConfigSpec.Builder builder, String commandName,
                                String defaultMinecraftCommand, String defaultDiscordCommand,
                                boolean defaultManagement) {

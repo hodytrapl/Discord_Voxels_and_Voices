@@ -19,12 +19,30 @@ import java.util.UUID;
 
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 
+/**
+ * Слушатель сообщений из Discord для пересылки в Minecraft.
+ * <p>
+ * Этот класс перехватывает сообщения из Discord канала и отправляет их
+ * в Minecraft чат, используя форматирование из конфигурации.
+ * </p>
+ */
 public class MessageListener extends ListenerAdapter {// храним ссылку
 
-    // Конструктор принимает сервер при создании
+    /**
+     * Конструктор слушателя сообщений.
+     */
     public MessageListener() {}
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    /**
+     * Обрабатывает полученное сообщение из Discord.
+     * <p>
+     * Если сообщение не от бота и событие DCtoMC включено,
+     * сообщение форматируется и отправляется в Minecraft.
+     * </p>
+     *
+     * @param event событие получения сообщения из Discord
+     */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         // Игнорируем сообщения от других ботов, чтобы избежать бесконечных циклов
@@ -50,6 +68,17 @@ public class MessageListener extends ListenerAdapter {// храним ссылк
         sendMessageToMinecraft(server,username,messageContent);
     }
 
+    /**
+     * Отправляет отформатированное сообщение в Minecraft чат.
+     * <p>
+     * Метод форматирует сообщение с использованием плейсхолдеров
+     * из конфигурации и отправляет его всем игрокам на сервере.
+     * </p>
+     *
+     * @param server экземпляр Minecraft сервера
+     * @param discordName имя пользователя Discord
+     * @param message текст сообщения
+     */
     private void sendMessageToMinecraft(MinecraftServer server, String discordName, String message) {
         if (server == null) {
             LOGGER.warn(getMessage("mod.typelogger.discord.error.serverminecraft.null"));

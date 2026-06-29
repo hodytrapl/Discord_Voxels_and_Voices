@@ -6,6 +6,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Конфигурация команд для Discord Linker.
+ * <p>
+ * Этот класс содержит все настройки, связанные с командами,
+ * включая префиксы команд, уровни доступа и настройки отдельных команд.
+ * </p>
+ */
 public class CommandsConfig {
     public static final CommandsConfig INSTANCE;
     public static final ModConfigSpec SPEC;
@@ -27,6 +34,12 @@ public class CommandsConfig {
         INSTANCE = pair.getLeft();
         SPEC = pair.getRight();
     }
+
+    /**
+     * Конструктор конфигурации команд.
+     *
+     * @param builder построитель конфигурации NeoForge
+     */
     @SuppressWarnings("deprecation")
     public CommandsConfig(ModConfigSpec.Builder builder) {
         //создаем группу

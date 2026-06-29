@@ -20,6 +20,13 @@ import org.slf4j.Logger;
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 import static org.hodytrapl.discord_linker.utils.ValidationUtils.isValidId;
 
+/**
+ * Менеджер Discord бота для интеграции с Minecraft сервером.
+ * <p>
+ * Этот класс управляет жизненным циклом Discord бота, включая его инициализацию,
+ * отправку сообщений, управление присутствием и перезагрузку.
+ * </p>
+ */
 public class DiscordBotManager {
     private static final Logger LOGGER = LogUtils.getLogger();
     private JDA jda;
@@ -28,6 +35,15 @@ public class DiscordBotManager {
     private static MinecraftServer currentServer;
     private ChannelUpdateService channelUpdateService;
 
+    /**
+     * Инициализирует Discord бота с указанным Minecraft сервером.
+     * <p>
+     * Метод создает экземпляр бота, регистрирует слушателей событий,
+     * устанавливает присутствие и запускает сервис обновления каналов.
+     * </p>
+     *
+     * @param server экземпляр Minecraft сервера
+     */
     public void initializeBot(MinecraftServer server) {
         synchronized (lock) {
             if (initialized) return;
@@ -59,14 +75,27 @@ public class DiscordBotManager {
         }
     }
 
+    /**
+     * Возвращает экземпляр JDA бота.
+     *
+     * @return экземпляр JDA или null, если бот не инициализирован
+     */
     public JDA getJda() {
         return jda;
     }
 
+    /**
+     * Возвращает сервис обновления каналов.
+     *
+     * @return экземпляр ChannelUpdateService
+     */
     public ChannelUpdateService getChannelUpdateService() {
         return channelUpdateService;
     }
 
+    /**
+     * Останавливает бота и освобождает ресурсы.
+     */
     public void shutdown() {
         if (channelUpdateService != null) {
             channelUpdateService.shutdown();
@@ -78,6 +107,9 @@ public class DiscordBotManager {
         initialized = false;
     }
 
+    /**
+     * Перезагружает бота с текущим сервером.
+     */
     public void reloadBot() {
         LOGGER.info(getMessage("mod.typelogger.discord.bot.reloading"));
         synchronized (lock) {
@@ -90,6 +122,18 @@ public class DiscordBotManager {
             initializeBot(currentServer);
         }
     }
+
+    /**
+     * Отправляет сообщение в Discord канал.
+     * <p>
+     * Метод форматирует сообщение в зависимости от типа и отправляет его
+     * в указанный канал. Длина сообщения ограничена 1900 символами.
+     * </p>
+     *
+     * @param channelId ID канала Discord
+     * @param content содержимое сообщения
+     * @param type тип сообщения для форматирования
+     */
     public void sendMessage(String channelId, String content, DiscordMessageType type) {
         if (jda == null) {
             LOGGER.warn(getMessage("mod.typelogger.discord.message.notinitialized"));
@@ -132,6 +176,13 @@ public class DiscordBotManager {
                 .queue(null, failure -> LOGGER.error(getMessage("mod.typelogger.discord.message.sendfailed",failure)));
     }
 
+    /**
+     * Устанавливает присутствие бота в Discord.
+     * <p>
+     * Если присутствие включено в конфигурации, устанавливает статус
+     * и пользовательское сообщение активности.
+     * </p>
+     */
     private void setBotPresence() {
         if (jda != null && MainConfigHelper.isPresenceEnabled()) {
             String presenceMessage = MainConfigHelper.getPresenceMessage();
@@ -140,6 +191,12 @@ public class DiscordBotManager {
         }
     }
 
+    /**
+     * Отправляет embed-сообщение в Discord канал.
+     *
+     * @param channelId ID канала Discord
+     * @param embed embed-сообщение для отправки
+     */
     public void sendEmbed(String channelId, MessageEmbed embed) {
         if (jda == null || !isValidId(channelId)) {
             LOGGER.warn(getMessage("mod.typelogger.discord.embed.notready"));
@@ -156,6 +213,16 @@ public class DiscordBotManager {
         );
     }
 
+    /**
+     * Отправляет сообщение в Discord канал синхронно.
+     * <p>
+     * Метод блокирует поток до завершения отправки.
+     * </p>
+     *
+     * @param channelId ID канала Discord
+     * @param content содержимое сообщения
+     * @param type тип сообщения для форматирования
+     */
     public void sendMessageSync(String channelId, String content, DiscordMessageType type) {
         if (jda == null) {
             LOGGER.warn(getMessage("mod.typelogger.discord.message.notinitialized"));
@@ -194,6 +261,12 @@ public class DiscordBotManager {
         }
     }
 
+    /**
+     * Отправляет embed-сообщение в Discord канал синхронно.
+     *
+     * @param channelId ID канала Discord
+     * @param embed embed-сообщение для отправки
+     */
     public void sendEmbedSync(String channelId, MessageEmbed embed) {
         if (jda == null || !isValidId(channelId)) {
             LOGGER.warn(getMessage("mod.typelogger.discord.embed.syncnotready"));

@@ -4,6 +4,14 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.Map;
 
+/**
+ * Конфигурация отдельного элемента основной конфигурации.
+ * <p>
+ * Этот класс содержит настройки для отдельного поля в основной конфигурации,
+ * включая его включение/отключение, ID канала Discord, интервал обновления
+ * и шаблон имени канала.
+ * </p>
+ */
 public class MainEntryConfig {
     // Main event settings
     public final ModConfigSpec.BooleanValue enable;
@@ -11,22 +19,29 @@ public class MainEntryConfig {
     public final ModConfigSpec.ConfigValue<Integer> updateInterval;
     public final ModConfigSpec.ConfigValue<String> name_channel;
 
+    /**
+     * Конструктор конфигурации элемента.
+     *
+     * @param builder построитель конфигурации NeoForge
+     * @param eventName имя события для группировки настроек
+     * @param payload карта с значениями по умолчанию
+     */
     public MainEntryConfig(ModConfigSpec.Builder builder, String eventName, Map<String, String> payload) {
         builder.comment("Configuration for " + eventName).push(eventName);
 
-        // Enable/disable the event
-        // If "enable" parameter is not specified in payload, event is enabled by default (true)
+        // включаем ивент
+        // поумолчанию включён
         boolean defaultEnable = Boolean.parseBoolean(payload.getOrDefault("enable", "true"));
         enable = builder
                 .comment("Enable or disable this event")
                 .define("enable", defaultEnable);
 
-        // Discord channel ID
+        // дискорд канал айди
         channelId = builder
                 .comment("The ID of the Discord voice channel (e.g., status updates) will be sent. Must be a valid snowflake ID.")
                 .define("channel_id", payload.getOrDefault("channel_id", "0000000000000000000"));
 
-        // Update interval
+        // интервал обновлений
         int defaultUpdateInterval = Integer.parseInt(payload.getOrDefault("update_interval", "30"));
         updateInterval = builder
                 .comment("Update interval for channel name in seconds",
@@ -37,7 +52,7 @@ public class MainEntryConfig {
                         "Examples: -1 (initialization only), 30 (every 30 seconds), 60 (every minute)")
                 .define("update_interval", defaultUpdateInterval);
 
-        // Channel name template
+        // имя канала
         name_channel = builder
                 .comment("Channel name template with placeholder support",
                         "Supported variables depend on the event type",
@@ -49,6 +64,6 @@ public class MainEntryConfig {
                         "When used with update_interval = -1, the name is set only once during startup")
                 .define("name_channel", payload.getOrDefault("name_channel", ""));
 
-        builder.pop(); // end event configuration
+        builder.pop(); // заканваем настройку
     }
 }

@@ -8,6 +8,13 @@ import org.hodytrapl.discord_linker.config.events.EventsConfig;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Основная конфигурация мода Discord Linker.
+ * <p>
+ * Этот класс содержит глобальные настройки мода, включая настройки бота,
+ * языковые настройки, Discord Presence и другие общие параметры.
+ * </p>
+ */
 public class MainConfig {
     // --- базовая настройка ---
     public static final MainConfig INSTANCE;
@@ -35,7 +42,11 @@ public class MainConfig {
     public final MainEntryConfig StaffOnline;
     public final MainEntryConfig VersionServer;
 
-    // конструктор
+    /**
+     * Конструктор основной конфигурации.
+     *
+     * @param builder построитель конфигурации NeoForge
+     */
     public MainConfig(ModConfigSpec.Builder builder){
         // Основные настройки
         builder.comment("General settings").push("general");
@@ -71,7 +82,7 @@ public class MainConfig {
                 .define("message", "play.example.com");
         builder.pop();
 
-        //базовый payload
+        //базовый payload всевозможных полей
         Map<String, String> basePayload = new HashMap<>();
         basePayload.put("enable", "false");
         basePayload.put("channel_id", "0000000000000000000");

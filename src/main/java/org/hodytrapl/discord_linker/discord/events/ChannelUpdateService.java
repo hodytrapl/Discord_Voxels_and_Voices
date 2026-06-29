@@ -25,10 +25,18 @@ import java.util.concurrent.TimeUnit;
 import static org.hodytrapl.discord_linker.LanguageManager.getMessage;
 
 
+/**
+ * Сервис для автоматического обновления названий голосовых каналов в Discord.
+ * <p>
+ * Этот класс управляет периодическим обновлением названий голосовых каналов
+ * на основе данных с Minecraft сервера, таких как количество игроков,
+ * онлайн персонала и версия сервера.
+ * </p>
+ */
 public class ChannelUpdateService {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static ChannelUpdateService instance;
-    private static final int INITIAL_DELAY_SECONDS = 30;
+    private static final int INITIAL_DELAY_SECONDS = 30; //ожидание перед тем как обновим каналы в первый раз
 
     private final ScheduledExecutorService scheduler;          // Планировщик для периодических задач
     private final Map<MainEntryConfig, ScheduledFuture<?>> scheduledTasks; // Активные задачи по событиям
@@ -42,6 +50,11 @@ public class ChannelUpdateService {
         this.placeholders = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Возвращает экземпляр сервиса (паттерн Singleton).
+     *
+     * @return экземпляр ChannelUpdateService
+     */
     public static ChannelUpdateService getInstance() {
         if (instance == null) {
             instance = new ChannelUpdateService();
@@ -49,6 +62,11 @@ public class ChannelUpdateService {
         return instance;
     }
 
+    /**
+     * Инициализирует сервис с экземпляром JDA.
+     *
+     * @param jda экземпляр Discord бота
+     */
     public void initialize(JDA jda) {
         if (initialized) {
             LOGGER.warn(getMessage("mod.typelogger.discord.channel.alreadyinitialized"));
@@ -68,6 +86,9 @@ public class ChannelUpdateService {
         initializeAllEvents();
     }
 
+    /**
+     * Инициализирует все события из конфигурации.
+     */
     private void initializeAllEvents() {
         // Получаем все события из конфига
         List<MainEntryConfig> events = getEventsFromConfig();
@@ -85,6 +106,12 @@ public class ChannelUpdateService {
         LOGGER.info(getMessage("mod.typelogger.discord.channel.initialized", events.size()));
     }
 
+    /**
+     * Инициализирует отдельное событие с указанной задержкой.
+     *
+     * @param event конфигурация события
+     * @param delaySeconds задержка в секундах перед первым обновлением
+     */
     private void initializeEventWithDelay(MainEntryConfig event, int delaySeconds) {
         // Проверяем, включено ли событие
         if (!MainConfigHelper.getEnableField(event)) {
@@ -130,6 +157,12 @@ public class ChannelUpdateService {
         }
     }
 
+    /**
+     * Планирует разовое обновление канала с указанной задержкой.
+     *
+     * @param event конфигурация события
+     * @param delaySeconds задержка в секундах
+     */
     private void scheduleOnceWithDelay(MainEntryConfig event, int delaySeconds) {
         scheduler.schedule(() -> {
             try {
@@ -145,6 +178,13 @@ public class ChannelUpdateService {
         }, delaySeconds, TimeUnit.SECONDS);
     }
 
+    /**
+     * Планирует периодическое обновление канала.
+     *
+     * @param event конфигурация события
+     * @param intervalSeconds интервал обновления в секундах
+     * @param delaySeconds начальная задержка в секундах
+     */
     private void schedulePeriodicUpdate(MainEntryConfig event,int intervalSeconds, int delaySeconds) {
         // Отменяем существующую задачу для этого события, если она есть
         ScheduledFuture<?> existing = scheduledTasks.remove(event);
@@ -170,6 +210,12 @@ public class ChannelUpdateService {
         scheduledTasks.put(event, task);
     }
 
+    /**
+     * Обновляет название голосового канала в Discord.
+     *
+     * @param event конфигурация события
+     * @param newName новое название канала
+     */
     private void updateDiscordChannel(MainEntryConfig event, String newName) {
         // Проверяем, что бот инициализирован
         if (jda == null || !initialized) {
@@ -232,6 +278,19 @@ public class ChannelUpdateService {
         }
     }
 
+    /**
+     * Обновляет значения всех плейсхолдеров на основе текущего состояния сервера.
+     * <p>
+     * Заполняет карту placeholders следующими значениями:
+     * <ul>
+     *   <li>onlineplayer - количество онлайн игроков</li>
+     *   <li>maxplayer - максимальное количество игроков</li>
+     *   <li>onlinestaff - количество онлайн персонала</li>
+     *   <li>maxstaff - максимальное количество персонала</li>
+     *   <li>version_server - версия сервера</li>
+     * </ul>
+     * </p>
+     */
     private void updatePlaceholders() {
         MinecraftServer server = Discord_linker.getServer();
         if (server == null) {
@@ -276,6 +335,11 @@ public class ChannelUpdateService {
         }
     }
 
+    /**
+     * Возвращает список всех событий из конфигурации.
+     *
+     * @return список конфигураций событий
+     */
     private List<MainEntryConfig> getEventsFromConfig() {
         List<MainEntryConfig> events = new java.util.ArrayList<>();
 
@@ -287,7 +351,11 @@ public class ChannelUpdateService {
         return events;
     }
 
-
+    /**
+     * Принудительно запускает обновление для указанного события.
+     *
+     * @param event конфигурация события для обновления
+     */
     public void triggerUpdate(MainEntryConfig event) {
         if (event == null || !initialized) {
             return;
@@ -295,7 +363,9 @@ public class ChannelUpdateService {
         scheduleOnceWithDelay(event,INITIAL_DELAY_SECONDS);
     }
 
-
+    /**
+     * Перезагружает сервис, отменяя все задачи и инициализируя заново.
+     */
     public void reload() {
         LOGGER.info(getMessage("mod.typelogger.discord.channel.reloading"));
 
@@ -314,6 +384,9 @@ public class ChannelUpdateService {
         }
     }
 
+    /**
+     * Останавливает сервис и освобождает ресурсы.
+     */
     public void shutdown() {
         LOGGER.info(getMessage("mod.typelogger.discord.channel.shuttingdown"));
 
@@ -337,6 +410,11 @@ public class ChannelUpdateService {
         LOGGER.info(getMessage("mod.typelogger.discord.channel.shutdown"));
     }
 
+    /**
+     * Проверяет, инициализирован ли сервис.
+     *
+     * @return true если сервис инициализирован, false в противном случае
+     */
     public boolean isInitialized() {
         return initialized;
     }
