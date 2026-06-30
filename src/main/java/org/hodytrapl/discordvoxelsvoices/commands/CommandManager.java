@@ -11,7 +11,7 @@ import org.hodytrapl.discordvoxelsvoices.utils.config.CommandsConfigHelper;
 /**
  * Центральный менеджер команд для регистрации всех команд Discord Linker.
  * <p>
- * Этот класс обрабатывает регистрацию корневой команды {@code /discordlinker}
+ * Этот класс обрабатывает регистрацию корневой команды {@code /discordvav}
  * и всех её подкоманд. Структура команд иерархическая, где подкоманды
  * предоставляют специфическую функциональность.
  * </p>
@@ -21,20 +21,20 @@ import org.hodytrapl.discordvoxelsvoices.utils.config.CommandsConfigHelper;
  */
 public class CommandManager {
     /**
-     * Регистрирует корневую команду {@code /discordlinker} и все подкоманды.
+     * Регистрирует корневую команду {@code /discordvav} и все подкоманды.
      * <p>
      * Метод связывает базовую команду со следующими подкомандами:
      * <ul>
-     *   <li>{@code /discordlinker mods} — просмотр списка установленных модификаций (см. {@link ModListCommand#register()})</li>
-     *   <li>{@code /discordlinker reload} — перезагрузка конфигурации мода (см. {@link ReloadCommand#register()})</li>
+     *   <li>{@code /discordvav mods} — просмотр списка установленных модификаций (см. {@link ModListCommand#register()})</li>
+     *   <li>{@code /discordvav reload} — перезагрузка конфигурации мода (см. {@link ReloadCommand#register()})</li>
      * </ul>
      * </p>
      *
      * @param dispatcher диспетчер команд сервера, в котором регистрируется команда
      */
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        // Создаем корень команды, discordlinker
-        LiteralArgumentBuilder<CommandSourceStack> rootCommand = Commands.literal("discordlinker");
+        // Создаем корень команды, discordvav
+        LiteralArgumentBuilder<CommandSourceStack> rootCommand = Commands.literal("discordvav");
 
         // Подключаем логику подкоманд
         rootCommand.then(ModListCommand.register());

@@ -106,7 +106,7 @@ dependencies {
     compileOnly('net.dv8tion:JDA:5.2.2') {
         exclude group: 'org.slf4j'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
-        exclude group: 'club.minnced', module: 'opus-java' // Исключаем Opus (аудио)
+        exclude group: 'club.minnced', module: 'opus-java'// Исключаем Opus (аудио)
     }
 
     // 2. Указываем плагину Shadow исключить аудио-модули
@@ -186,6 +186,10 @@ shadowJar {
     relocate 'com.sun.jna', 'org.hodytrapl.discordvoxelsvoices.shadow.jna'
     relocate 'gnu.trove', 'org.hodytrapl.discordvoxelsvoices.shadow.trove'
     relocate 'com.neovisionaries', 'org.hodytrapl.discordvoxelsvoices.shadow.neovisionaries'
+
+    // исправляем зависимости котлина
+    relocate 'kotlin', 'org.hodytrapl.discordvoxelsvoices.shadow.kotlin'
+    relocate 'kotlinx', 'org.hodytrapl.discordvoxelsvoices.shadow.kotlinx'
 
     // Жестко вырезаем дублирующиеся системные пакеты
     exclude 'javax/annotation/**'

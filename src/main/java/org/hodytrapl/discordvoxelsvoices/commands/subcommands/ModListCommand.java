@@ -30,7 +30,7 @@ public class ModListCommand  {
      * заданным в {@link CommandsConfigHelper#getMinecraftManagementUserPermissionLevel()}.
      * </p>
      * <p>
-     * Пример использования: {@code /discordlinker mods}
+     * Пример использования: {@code /discordvav mods}
      * </p>
      *
      * @return объект {@link LiteralArgumentBuilder}, содержащий конфигурацию подкоманды
